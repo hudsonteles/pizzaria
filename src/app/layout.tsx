@@ -1,4 +1,3 @@
-import AuthProvider from "@/providers/AuthProvider";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
@@ -32,9 +31,7 @@ export default async function RootLayout({
                 />
             </head>
             <body className={roboto.className}>
-                <AuthProvider>
-                    {children}
-                </AuthProvider>
+                {children}
             </body>
         </html>
     );
