@@ -1,0 +1,58 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+.swal2-container {
+    z-index: 1301;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgba(36, 56, 129);
+    border-radius: 3px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(36, 56, 129);
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #e7eaf1;
+}
+
+  /* Corner */
+::-webkit-scrollbar-corner {
+    background: #e7eaf1;
+}
+
+.MuiOutlinedInput-root {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.MuiOutlinedInput-input {
+    padding: 4px 14px 7px !important;
+}
+
+.MuiInputBase-inputMultiline {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.MuiAutocomplete-input {
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+}
