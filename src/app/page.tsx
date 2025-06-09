@@ -4,7 +4,7 @@ import MainContainer from "@/components/containers/main-container";
 import { Add, Delete } from "@mui/icons-material";
 import { Box, Container, Divider, Grid2, IconButton, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-
+import { Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 type BrandQuote = {
     brand: string;
@@ -83,8 +83,8 @@ const initialIngredients: Ingredient[] = [
     { id: 7, name: "Queijo Mussarela", unit: "g", perPizza: { marguerita: 120, calabresa: 120, toscana: 120, gorgonzola: 120 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
     { id: 8, name: "Queijo Gorgonzola", unit: "g", perPizza: { marguerita: 0, calabresa: 0, toscana: 0, gorgonzola: 60 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
     { id: 9, name: "Linguiça Toscana", unit: "g", perPizza: { marguerita: 0, calabresa: 0, toscana: 60, gorgonzola: 0 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
-    { id: 10, name: "Tomate cereja", unit: "un", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "Assaí", priceKG: 15 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Assaí", },
-    { id: 11, name: "Manjericão", unit: "folha", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "Adega", priceKG: 4 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Adega", },
+    { id: 10, name: "Tomate cereja", unit: "un", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
+    { id: 11, name: "Manjericão", unit: "folha", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
 ];
 
 type EquipmentQuote = {
@@ -168,10 +168,10 @@ const Index = () => {
     );
     const [pizzaParams, setPizzaParams] = useState(
         () => loadFromStorage("pizzaParams", {
-            marguerita: { price: 38, month: 50 },
-            calabresa: { price: 40, month: 60 },
-            toscana: { price: 42, month: 50 },
-            gorgonzola: { price: 45, month: 40 },
+            marguerita: { price: 35, month: 50 },
+            calabresa: { price: 35, month: 50 },
+            toscana: { price: 35, month: 50 },
+            gorgonzola: { price: 35, month: 50 },
         })
     );
     const [doughComp, setDoughComp] = useState(
@@ -403,6 +403,27 @@ const Index = () => {
 
     const equipmentInstallmentValue = equipmentInstallments > 0 ? totalEquipment / equipmentInstallments : totalEquipment;
 
+    // KPIs extras
+    const pizzasPorDia = (totalRevenue / pizzaTypes.reduce((acc, pt) => acc + pizzaParams[pt.key].price, 0) / 30).toFixed(1);
+    const ticketMedio = (totalRevenue / pizzaTypes.reduce((acc, pt) => acc + pizzaParams[pt.key].month, 0)).toFixed(2);
+    const pontoEquilibrio = fixedCostMonth > 0 ? (fixedCostMonth / (totalRevenue / pizzaTypes.reduce((acc, pt) => acc + pizzaParams[pt.key].month, 0))).toFixed(1) : "--";
+
+    // Dados para gráficos
+    const receitaCustoData = results.map(r => ({
+        name: r.label,
+        Receita: r.revenue,
+        "Custo Variável": r.variable,
+        "Custo Fixo": fixedCostMonth / pizzaTypes.length,
+        Lucro: r.revenue - r.variable - fixedCostMonth / pizzaTypes.length
+    }));
+
+    const vendasData = pizzaTypes.map(pt => ({
+        name: pt.label,
+        Vendas: pizzaParams[pt.key].month
+    }));
+
+    const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
     return (
 
         <MainContainer>
@@ -412,7 +433,7 @@ const Index = () => {
                         Planejamento Estratégico - Pizzaria Entre Amigos
                     </Typography>
                     <Typography align="center" color="text.secondary" gutterBottom>
-                        Simulador de Viabilidade | Tudo dinâmico para seu planejamento!
+                        Simulador de Viabilidade
                     </Typography>
                 </Box>
                 {/* 1. Parâmetros de Venda por Pizza */}
@@ -1056,11 +1077,66 @@ const Index = () => {
                 </Paper>
                 <Divider sx={{ my: 3 }} />
                 {/* Resumo */}
-                <Box sx={{ p: 3, backgroundColor: "#f1f8e9", borderRadius: 2, boxShadow: 1 }}>
+                <Box sx={{ p: 3, backgroundColor: "#f1f8e9", borderRadius: 2, boxShadow: 1, mb: 4 }}>
                     <Typography variant="h5" color="secondary" gutterBottom>
                         6. Simulação de Resultados
                     </Typography>
-                    <TableContainer>
+                    {/* Indicadores rápidos */}
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, mb: 3 }}>
+                        <Box>
+                            <Typography variant="subtitle2">Lucro Líquido Mensal</Typography>
+                            <Typography variant="h6" color={grossProfit > 0 ? "green" : "red"}>R$ {grossProfit.toFixed(2)}</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="subtitle2">Margem Líquida</Typography>
+                            <Typography variant="h6">{marginPercent} %</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="subtitle2">Payback</Typography>
+                            <Typography variant="h6">{payback} meses</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="subtitle2">Ticket Médio</Typography>
+                            <Typography variant="h6">R$ {ticketMedio}</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="subtitle2">Pizzas/dia</Typography>
+                            <Typography variant="h6">{pizzasPorDia}</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="subtitle2">Ponto de Equilíbrio</Typography>
+                            <Typography variant="h6">{pontoEquilibrio} pizzas/mês</Typography>
+                        </Box>
+                    </Box>
+                    {/* Gráfico Receita x Custos x Lucro */}
+                    <Typography variant="subtitle2" sx={{ mt: 2 }}>Receita, Custos e Lucro por Pizza</Typography>
+                    <ResponsiveContainer width="100%" height={260}>
+                        <BarChart data={receitaCustoData}>
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="Receita" fill="#0088FE" />
+                            <Bar dataKey="Custo Variável" fill="#FFBB28" />
+                            <Bar dataKey="Custo Fixo" fill="#FF8042" />
+                            <Bar dataKey="Lucro" fill="#00C49F" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                    {/* Gráfico de vendas por sabor */}
+                    <Typography variant="subtitle2" sx={{ mt: 4 }}>Distribuição de Vendas por Sabor</Typography>
+                    <ResponsiveContainer width="100%" height={220}>
+                        <PieChart>
+                            <Pie data={vendasData} dataKey="Vendas" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+                                {vendasData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                    {/* Tabela detalhada já existente */}
+                    <TableContainer sx={{ mt: 4 }}>
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
