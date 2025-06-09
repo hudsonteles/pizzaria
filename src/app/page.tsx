@@ -2,8 +2,8 @@
 
 import MainContainer from "@/components/containers/main-container";
 import { Add, Delete } from "@mui/icons-material";
-import { Box, Container, Divider, IconButton, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Container, Divider, Grid2, IconButton, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 
 
 type BrandQuote = {
@@ -36,37 +36,107 @@ const initialIngredients: Ingredient[] = [
         unit: "g",
         perPizza: { marguerita: 200, calabresa: 200, toscana: 200, gorgonzola: 200 },
         quotes: [
-            { brand: "Dona Benta", priceKG: 6 },
+            { brand: "Anaconda", priceKG: 5.15 },
+            { brand: "Venturelli", priceKG: 5 },
+            { brand: "Caputo", priceKG: 20 },
+        ],
+        selectedBrand: "Anaconda",
+    },
+    { id: 2, name: "Fermento seco", unit: "g", perPizza: { marguerita: 4, calabresa: 4, toscana: 4, gorgonzola: 4 }, quotes: [{ brand: "Fleischmann", priceKG: 180 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Fleischmann", },
+    {
+        id: 3,
+        name: "Sal",
+        unit: "g",
+        perPizza: { marguerita: 3, calabresa: 3, toscana: 3, gorgonzola: 3 },
+        quotes: [
+            { brand: "Cisne", priceKG: 3 },
             { brand: "", priceKG: 0 },
             { brand: "", priceKG: 0 },
         ],
-        selectedBrand: "Dona Benta",
+        selectedBrand: "Cisne",
+    },
+    {
+        id: 4,
+        name: "Azeite",
+        unit: "ml",
+        perPizza: { marguerita: 10, calabresa: 10, toscana: 10, gorgonzola: 10 },
+        quotes: [
+            { brand: "Andorinha", priceKG: 40 }, // preço por litro, ajuste se necessário
+            { brand: "", priceKG: 0 },
+            { brand: "", priceKG: 0 },
+        ],
+        selectedBrand: "Andorinha",
+    },
+    {
+        id: 5,
+        name: "Semolina",
+        unit: "g",
+        perPizza: { marguerita: 5, calabresa: 5, toscana: 5, gorgonzola: 5 },
+        quotes: [
+            { brand: "Venturelli", priceKG: 9 },
+            { brand: "Caputo", priceKG: 0 },
+            { brand: "", priceKG: 0 },
+        ],
+        selectedBrand: "Venturelli",
+    },
+    { id: 6, name: "Passata rústica de tomate", unit: "g", perPizza: { marguerita: 50, calabresa: 50, toscana: 50, gorgonzola: 50 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
+    { id: 7, name: "Queijo Mussarela", unit: "g", perPizza: { marguerita: 120, calabresa: 120, toscana: 120, gorgonzola: 120 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
+    { id: 8, name: "Queijo Gorgonzola", unit: "g", perPizza: { marguerita: 0, calabresa: 0, toscana: 0, gorgonzola: 60 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
+    { id: 9, name: "Linguiça Toscana", unit: "g", perPizza: { marguerita: 0, calabresa: 0, toscana: 60, gorgonzola: 0 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
+    { id: 10, name: "Tomate cereja", unit: "un", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "Cereja", priceKG: 15 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Cereja", },
+    { id: 11, name: "Manjericão", unit: "folha", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "Manjericão Fresco", priceKG: 4 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Manjericão Fresco", },
+];
+
+// Adicione o tipo para EquipmentQuote e Equipment
+type EquipmentQuote = {
+    brand: string;
+    price: number;
+};
+type Equipment = {
+    id: number;
+    name: string;
+    quotes: EquipmentQuote[];
+    selectedBrand: string;
+};
+
+// Atualize o estado inicial dos equipamentos
+const initialEquipments: Equipment[] = [
+    {
+        id: 1,
+        name: "Forno a gás p/ 1 pizza",
+        quotes: [
+            { brand: "Plus KiLocal, 35cm", price: 3468 },
+            { brand: "Witt Etna Rotante, 40cm", price: 8499 },
+            { brand: "EZ Oven 45 Duo", price: 2790 }
+        ],
+        selectedBrand: "Plus KiLocal, 35cm"
     },
     {
         id: 2,
-        name: "Semolina",
-        unit: "g",
-        perPizza: { marguerita: 20, calabresa: 20, toscana: 20, gorgonzola: 20 },
+        name: "Masseira espiral",
         quotes: [
-            { brand: "Renata", priceKG: 9 },
-            { brand: "", priceKG: 0 },
-            { brand: "", priceKG: 0 },
+            { brand: "Sebem 5kg", price: 6600 },
+            { brand: "Braesi 5kg", price: 4490 },
+            { brand: "Stand Mixer 7.6l", price: 5719.90 }
         ],
-        selectedBrand: "Renata",
+        selectedBrand: "Sebem 5kg"
     },
-    { id: 3, name: "Fermento seco", unit: "g", perPizza: { marguerita: 4, calabresa: 4, toscana: 4, gorgonzola: 4 }, quotes: [ { brand: "Fleischmann", priceKG: 180 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, ], selectedBrand: "Fleischmann", },
-    { id: 4, name: "Queijo mussarela", unit: "g", perPizza: { marguerita: 120, calabresa: 100, toscana: 140, gorgonzola: 80 }, quotes: [ { brand: "Tirolez", priceKG: 25 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, ], selectedBrand: "Tirolez", },
-    { id: 5, name: "Queijo provolone", unit: "g", perPizza: { marguerita: 40, calabresa: 60, toscana: 20, gorgonzola: 10 }, quotes: [ { brand: "Polenghi", priceKG: 38 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, ], selectedBrand: "Polenghi", },
-    { id: 6, name: "Linguiça toscana", unit: "g", perPizza: { marguerita: 50, calabresa: 70, toscana: 30, gorgonzola: 10 }, quotes: [ { brand: "Seara", priceKG: 24 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, ], selectedBrand: "Seara", },
-    { id: 7, name: "Tomate cereja", unit: "un", perPizza: { marguerita: 5, calabresa: 3, toscana: 4, gorgonzola: 2 }, quotes: [ { brand: "Cereja", priceKG: 15 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, ], selectedBrand: "Cereja", },
-    { id: 8, name: "Manjericão", unit: "folha", perPizza: { marguerita: 5, calabresa: 2, toscana: 3, gorgonzola: 1 }, quotes: [ { brand: "Manjericão Fresco", priceKG: 4 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, ], selectedBrand: "Manjericão Fresco", },
-    { id: 9, name: "Pasta rústica de tomate", unit: "g", perPizza: { marguerita: 30, calabresa: 20, toscana: 25, gorgonzola: 15 }, quotes: [ { brand: "Pomodoro", priceKG: 22 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, ], selectedBrand: "Pomodoro", },
+    {
+        id: 4,
+        name: "Utensílios & assadeiras",
+        quotes: [
+            { brand: "Diversos", price: 800 },
+            { brand: "", price: 0 },
+            { brand: "", price: 0 }
+        ],
+        selectedBrand: "Diversos"
+    }
 ];
-
 
 const Index = () => {
 
     const [ingredients, setIngredients] = useState<Ingredient[]>(initialIngredients);
+    const [equipments, setEquipments] = useState<Equipment[]>(initialEquipments);
 
     // Outros insumos
     const [extraCosts, setExtraCosts] = useState<{
@@ -74,20 +144,7 @@ const Index = () => {
         name: string;
         value: number;
     }[]>([
-        { id: 1, name: "Água, azeite, sal", value: 0.3 },
-        { id: 2, name: "Embalagem a vácuo", value: 1.4 }
-    ]);
-    // Máquinas
-    const [equipments, setEquipments] = useState<{
-        id: number;
-        name: string;
-        price: number;
-        installments: number;
-    }[]>([
-        { id: 1, name: "Forno a gás p/ 1 pizza", price: 2800, installments: 10 },
-        { id: 2, name: "Masseira espiral 10kg", price: 4500, installments: 10 },
-        { id: 3, name: "Seladora a vácuo", price: 1300, installments: 10 },
-        { id: 4, name: "Utensílios & assadeiras", price: 800, installments: 1 }
+        { id: 1, name: "Embalagem a vácuo", value: 1.4 }
     ]);
     // Custos fixos operacionais
     const [fixedCosts, setFixedCosts] = useState<{
@@ -96,9 +153,7 @@ const Index = () => {
         value: number;
     }[]>([
         { id: 1, name: "Botijão de gás P13 (mensal)", value: 240 },
-        { id: 2, name: "Energia elétrica (mensal)", value: 90 },
-        { id: 3, name: "Delivery (apps, fixo ou %)", value: 300 },
-        { id: 4, name: "Outros custos fixos", value: 100 },
+        { id: 2, name: "Energia elétrica (mensal)", value: 90 }
     ]);
     // Parâmetros do negócio
     const [pizzaParams, setPizzaParams] = useState({
@@ -108,10 +163,53 @@ const Index = () => {
         gorgonzola: { price: 45, month: 40 },
     });
     // Controle de edição/adição
-    const [newIngredient, setNewIngredient] = useState({ name: "", unit: "g", perPizza: "", priceKG: "" });
+    const [newIngredient, setNewIngredient] = useState({
+        name: "",
+        unit: "g",
+        perPizza: "",
+        brand: "",
+        priceKG: ""
+    });
     const [newExtra, setNewExtra] = useState({ name: "", value: "" });
-    const [newEquipment, setNewEquipment] = useState({ name: "", price: "", installments: "" });
+    const [newEquipment, setNewEquipment] = useState({ name: "", price: "", brand: "" });
     const [newFixedCost, setNewFixedCost] = useState({ name: "", value: "" });
+
+    // Novo estado para composição da massa
+    const [doughComp, setDoughComp] = useState({
+        farinha: 1000, // g
+        fermento: 4,   // g
+        sal: 20,       // g
+        azeite: 30,    // ml
+        agua: 600      // ml
+    });
+    const [doughYield, setDoughYield] = useState(6); // pizzas possíveis
+
+    // IDs fixos para ingredientes da massa
+    const MASSA_IDS = {
+        farinha: 1,
+        fermento: 2,
+        sal: 3,
+        azeite: 4,
+    };
+
+    // Atualiza ingredientes de massa conforme composição e rendimento
+    useEffect(() => {
+        setIngredients(prev => prev.map(ing => {
+            if (ing.id === MASSA_IDS.farinha) {
+                return { ...ing, perPizza: pizzaTypes.reduce((acc, pt) => ({ ...acc, [pt.key]: doughComp.farinha / doughYield }), {}) };
+            }
+            if (ing.id === MASSA_IDS.fermento) {
+                return { ...ing, perPizza: pizzaTypes.reduce((acc, pt) => ({ ...acc, [pt.key]: doughComp.fermento / doughYield }), {}) };
+            }
+            if (ing.id === MASSA_IDS.sal) {
+                return { ...ing, perPizza: pizzaTypes.reduce((acc, pt) => ({ ...acc, [pt.key]: doughComp.sal / doughYield }), {}) };
+            }
+            if (ing.id === MASSA_IDS.azeite) {
+                return { ...ing, perPizza: pizzaTypes.reduce((acc, pt) => ({ ...acc, [pt.key]: doughComp.azeite / doughYield }), {}) };
+            }
+            return ing;
+        }));
+    }, [doughComp, doughYield, pizzaTypes]);
 
     // ----- Lógicas de custo -----
 
@@ -186,7 +284,11 @@ const Index = () => {
     const fixedCostMonth = fixedCosts.reduce((s, c) => s + Number(c.value), 0);
     const grossProfit = totalRevenue - totalVariable - fixedCostMonth;
     const marginPercent = ((grossProfit / totalRevenue) * 100).toFixed(2);
-    const totalEquipment = equipments.reduce((sum, eq) => sum + Number(eq.price), 0);
+    // Calcule o investimento total e o valor da parcela
+    const totalEquipment = equipments.reduce((sum, eq) => {
+        const selected = eq.quotes.find(q => q.brand === eq.selectedBrand) || eq.quotes[0];
+        return sum + (selected?.price || 0);
+    }, 0);
     const payback = grossProfit > 0 ? (totalEquipment / grossProfit).toFixed(1) : "--";
 
     // --- Handlers CRUD ---
@@ -198,12 +300,23 @@ const Index = () => {
         ));
     };
     const addIngredient = () => {
-        if (!newIngredient.name || !newIngredient.perPizza || !newIngredient.priceKG) return;
+        if (!newIngredient.name || !newIngredient.perPizza || !newIngredient.priceKG || !newIngredient.brand) return;
         setIngredients([
             ...ingredients,
-            { id: Date.now(), ...newIngredient, perPizza: Number(newIngredient.perPizza), priceKG: Number(newIngredient.priceKG), }
+            {
+                id: Date.now(),
+                name: newIngredient.name,
+                unit: newIngredient.unit,
+                perPizza: pizzaTypes.reduce((acc, pt) => ({ ...acc, [pt.key]: Number(newIngredient.perPizza) }), {}),
+                quotes: [
+                    { brand: newIngredient.brand, priceKG: Number(newIngredient.priceKG) },
+                    { brand: "", priceKG: 0 },
+                    { brand: "", priceKG: 0 }
+                ],
+                selectedBrand: newIngredient.brand,
+            }
         ]);
-        setNewIngredient({ name: "", unit: "g", perPizza: "", priceKG: "" });
+        setNewIngredient({ name: "", unit: "g", perPizza: "", brand: "", priceKG: "" });
     };
     const deleteIngredient = (id) => setIngredients(ingredients.filter(x => x.id !== id));
 
@@ -220,10 +333,38 @@ const Index = () => {
     // Equipamentos
     const handleEquipmentChange = (id, field, value) =>
         setEquipments(equipments.map(e => e.id === id ? { ...e, [field]: value } : e));
+
+    const handleEquipmentQuoteChange = (eqId, quoteIdx, field, value) => {
+        setEquipments(equipments.map(eq => {
+            if (eq.id !== eqId) return eq;
+            const quotes = eq.quotes.map((q, i) =>
+                i === quoteIdx ? { ...q, [field]: value } : q
+            );
+            return { ...eq, quotes };
+        }));
+    };
+
+    const handleEquipmentBrandSelect = (eqId, brand) => {
+        setEquipments(equipments.map(eq =>
+            eq.id === eqId ? { ...eq, selectedBrand: brand } : eq
+        ));
+    };
     const addEquipment = () => {
-        if (!newEquipment.name || !newEquipment.price || !newEquipment.installments) return;
-        setEquipments([...equipments, { id: Date.now(), ...newEquipment, price: Number(newEquipment.price), installments: Number(newEquipment.installments) }]);
-        setNewEquipment({ name: "", price: "", installments: "" });
+        if (!newEquipment.name || !newEquipment.price || !newEquipment.brand) return;
+        setEquipments([
+            ...equipments,
+            {
+                id: Date.now(),
+                name: newEquipment.name,
+                quotes: [
+                    { brand: newEquipment.brand, price: Number(newEquipment.price) },
+                    { brand: "", price: 0 },
+                    { brand: "", price: 0 }
+                ],
+                selectedBrand: newEquipment.brand
+            }
+        ]);
+        setNewEquipment({ name: "", price: "", brand: "" });
     };
     const deleteEquipment = id => setEquipments(equipments.filter(x => x.id !== id));
 
@@ -237,6 +378,11 @@ const Index = () => {
     };
     const deleteFixedCost = id => setFixedCosts(fixedCosts.filter(x => x.id !== id));
 
+    // Acrescente o estado para número de parcelas dos equipamentos
+    const [equipmentInstallments, setEquipmentInstallments] = useState(10);
+
+    const equipmentInstallmentValue = equipmentInstallments > 0 ? totalEquipment / equipmentInstallments : totalEquipment;
+
     return (
 
         <MainContainer>
@@ -249,6 +395,7 @@ const Index = () => {
                         Simulador de Viabilidade | Tudo dinâmico para seu planejamento!
                     </Typography>
                 </Box>
+                {/* 1. Parâmetros de Venda por Pizza */}
                 <Paper sx={{ p: 3, mb: 4 }}>
                     <Typography variant="h5" color="secondary" gutterBottom>1. Parâmetros de Venda por Pizza</Typography>
                     <TableContainer>
@@ -288,123 +435,337 @@ const Index = () => {
                         </Table>
                     </TableContainer>
                 </Paper>
-                {/* Ingredientes por pizza */}
+                {/* 2. Composição da Massa */}
                 <Paper sx={{ p: 3, mb: 4 }}>
                     <Typography variant="h5" color="secondary" gutterBottom>
-                        2. Ingredientes por Pizza (até 3 orçamentos por item)
+                        2. Composição da Massa
                     </Typography>
-                    <TableContainer>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell rowSpan={2} sx={{ minWidth: 120, fontWeight: 'bold' }}>Ingrediente</TableCell>
-                                    <TableCell rowSpan={2} sx={{ minWidth: 60, fontWeight: 'bold' }}>Unidade</TableCell>
-                                    {pizzaTypes.map(pt => (
-                                        <TableCell key={pt.key} align="center" colSpan={1} sx={{ fontWeight: 'bold' }}>
-                                            {pt.label}
-                                        </TableCell>
-                                    ))}
-                                    <TableCell rowSpan={2} align="center" sx={{ minWidth: 110, fontWeight: 'bold' }}>Marca Selecionada</TableCell>
-                                    <TableCell rowSpan={2} align="center" sx={{ minWidth: 80, fontWeight: 'bold' }}>Valor/kg</TableCell>
-                                    <TableCell rowSpan={2} align="center" sx={{ minWidth: 180, fontWeight: 'bold' }}>Orçamentos (Marca / R$/kg)</TableCell>
-                                    <TableCell rowSpan={2} align="center" sx={{ fontWeight: 'bold' }}>Excluir</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    {pizzaTypes.map(pt => (
-                                        <TableCell key={pt.key} align="center" sx={{ fontWeight: 'bold' }}>Qtd</TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {ingredients.map((ing, i) => (
-                                    <TableRow key={ing.id}>
-                                        <TableCell>
+                    <Grid2 container spacing={2}>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 2 }}>
+                            <TextField
+                                label="Farinha (g)"
+                                type="number"
+                                value={doughComp.farinha}
+                                onChange={e => setDoughComp({ ...doughComp, farinha: Number(e.target.value) })}
+                                fullWidth
+                            />
+                        </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 2 }}>
+                            <TextField
+                                label="Fermento (g)"
+                                type="number"
+                                value={doughComp.fermento}
+                                onChange={e => setDoughComp({ ...doughComp, fermento: Number(e.target.value) })}
+                                fullWidth
+                            />
+                        </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 2 }}>
+                            <TextField
+                                label="Sal (g)"
+                                type="number"
+                                value={doughComp.sal}
+                                onChange={e => setDoughComp({ ...doughComp, sal: Number(e.target.value) })}
+                                fullWidth
+                            />
+                        </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 2 }}>
+                            <TextField
+                                label="Azeite (ml)"
+                                type="number"
+                                value={doughComp.azeite}
+                                onChange={e => setDoughComp({ ...doughComp, azeite: Number(e.target.value) })}
+                                fullWidth
+                            />
+                        </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 2 }}>
+                            <TextField
+                                label="Água (ml)"
+                                type="number"
+                                value={doughComp.agua}
+                                onChange={e => setDoughComp({ ...doughComp, agua: Number(e.target.value) })}
+                                fullWidth
+                            />
+                        </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 2 }}>
+                            <TextField
+                                label="Rendimento (pizzas)"
+                                type="number"
+                                value={doughYield}
+                                onChange={e => setDoughYield(Number(e.target.value))}
+                                fullWidth
+                            />
+                        </Grid2>
+                    </Grid2>
+                </Paper>
+                {/* 3. Ingredientes por Pizza */}
+                <Paper sx={{ p: 3, mb: 4 }}>
+                    <Typography variant="h5" color="secondary" gutterBottom>
+                        3. Ingredientes por Pizza (até 3 orçamentos por item)
+                    </Typography>
+                    <Grid2 container spacing={2}>
+                        {/* Cards fixos para farinha, fermento, sal, azeite - sempre nos primeiros itens */}
+                        {Object.values(MASSA_IDS).map(id => {
+                            const ing = ingredients.find(ing => ing.id === id);
+                            if (!ing) return null;
+                            return (
+                                <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={ing.id}>
+                                    <Paper elevation={3} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1, opacity: 1 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                                             <TextField
                                                 value={ing.name}
                                                 variant="standard"
-                                                onChange={e => setIngredients(ingredients.map((x, idx) => idx === i ? { ...x, name: e.target.value } : x))}
-                                                sx={{ minWidth: 120 }}
+                                                label="Ingrediente"
+                                                disabled
+                                                sx={{ flex: 1, mb: 1 }}
+                                                fullWidth
+                                            />
+                                        </Box>
+                                        <Grid2 container spacing={1}>
+                                            {pizzaTypes.map((pt, idx) => (
+                                                <Grid2 size={{ xs: 6 }} key={pt.key}>
+                                                    <TextField
+                                                        label={pt.label}
+                                                        value={Number(ing.perPizza[pt.key] || 0).toFixed(2)}
+                                                        type="number"
+                                                        variant="standard"
+                                                        InputProps={{ endAdornment: <span>{ing.unit}</span> }}
+                                                        disabled
+                                                        sx={{ width: '100%' }}
+                                                        size="small"
+                                                    />
+                                                </Grid2>
+                                            ))}
+                                        </Grid2>
+                                        <Divider sx={{ my: 1 }} />
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
+                                            <Typography variant="caption" sx={{ mb: 0.5 }}>
+                                                Marca Selecionada
+                                            </Typography>
+                                            <Select
+                                                value={ing.selectedBrand}
+                                                onChange={e => handleBrandSelect(ing.id, e.target.value)}
+                                                size="small"
+                                                sx={{
+                                                    width: '100%',
+                                                    bgcolor: 'primary.light',
+                                                    fontWeight: 'bold',
+                                                    border: '2px solid',
+                                                    borderColor: 'primary.main',
+                                                    color: 'white'
+                                                }}
+                                                displayEmpty
+                                            >
+                                                <MenuItem value=""><em>Selecione</em></MenuItem>
+                                                {ing.quotes.map((q, idx) =>
+                                                    q.brand ? <MenuItem key={idx} value={q.brand}>{q.brand}</MenuItem> : null
+                                                )}
+                                            </Select>
+                                        </Box>
+                                        <Box sx={{ width: '100%' }}>
+                                            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+                                                Orçamentos / Mercados
+                                            </Typography>
+                                            {ing.quotes.map((q, idx) => (
+                                                <Box key={idx} sx={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                    mb: 1,
+                                                    p: 1,
+                                                    borderRadius: 1,
+                                                    bgcolor: q.brand === ing.selectedBrand ? 'primary.lighter' : 'transparent',
+                                                    border: q.brand === ing.selectedBrand ? '1.5px solid' : '1px dashed #eee',
+                                                    borderColor: q.brand === ing.selectedBrand ? 'primary.main' : '#eee'
+                                                }}>
+                                                    <Typography variant="body2" sx={{ minWidth: 22, fontWeight: 600 }}>{idx + 1}.</Typography>
+                                                    <TextField
+                                                        value={q.brand}
+                                                        label="Marca/Mercado"
+                                                        size="small"
+                                                        variant="standard"
+                                                        sx={{ flex: 1 }}
+                                                        fullWidth
+                                                        onChange={e => handleQuoteChange(ing.id, idx, "brand", e.target.value)}
+                                                    />
+                                                    <TextField
+                                                        value={q.priceKG}
+                                                        type="number"
+                                                        label="Valor (R$/kg)"
+                                                        size="small"
+                                                        variant="standard"
+                                                        sx={{ flex: 1, ml: 1 }}
+                                                        fullWidth
+                                                        onChange={e => handleQuoteChange(ing.id, idx, "priceKG", e.target.value)}
+                                                        InputProps={{ startAdornment: <span>R$</span> }}
+                                                    />
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    </Paper>
+                                </Grid2>
+                            );
+                        })}
+                        {/* Demais ingredientes (excluíveis normalmente) */}
+                        {ingredients.filter(ing =>
+                            ![MASSA_IDS.farinha, MASSA_IDS.fermento, MASSA_IDS.sal, MASSA_IDS.azeite].includes(ing.id)
+                        ).map((ing, i) => (
+                            <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={ing.id}>
+                                <Paper elevation={3} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    {/* Nome do ingrediente ocupa linha toda */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                                        <TextField
+                                            value={ing.name}
+                                            variant="standard"
+                                            label="Ingrediente"
+                                            onChange={e => setIngredients(ingredients.map((x, idx) => idx === i ? { ...x, name: e.target.value } : x))}
+                                            sx={{ flex: 1, mb: 1 }}
+                                            fullWidth
                                         />
-                                        </TableCell>
-                                        <TableCell align="center">{ing.unit}</TableCell>
-                                        {pizzaTypes.map(pt => (
-                                            <TableCell key={pt.key} align="center">
+                                        <IconButton onClick={() => deleteIngredient(ing.id)} size="small" color="error">
+                                            <Delete />
+                                        </IconButton>
+                                    </Box>
+                                    {/* Pizzas em 2 por linha */}
+                                    <Grid2 container spacing={1}>
+                                        {pizzaTypes.map((pt, idx) => (
+                                            <Grid2 size={{ xs: 6 }} key={pt.key}>
                                                 <TextField
+                                                    label={pt.label}
                                                     value={ing.perPizza[pt.key] || ""}
                                                     type="number"
                                                     variant="standard"
                                                     InputProps={{ endAdornment: <span>{ing.unit}</span> }}
                                                     onChange={e => handlePerPizzaChange(ing.id, pt.key, e.target.value)}
-                                                    sx={{ width: 60 }}
+                                                    sx={{ width: '100%' }}
+                                                    size="small"
                                                 />
-                                            </TableCell>
+                                            </Grid2>
                                         ))}
-                                        <TableCell align="center">
-                                            <Select
-                                                value={ing.selectedBrand}
-                                                onChange={e => handleBrandSelect(ing.id, e.target.value)}
-                                                size="small"
-                                                sx={{ width: 110 }}
-                                            >
-                                                {ing.quotes.map((q, idx) =>
-                                                    q.brand ? <MenuItem key={idx} value={q.brand}>{q.brand}</MenuItem> : null
-                                                )}
-                                            </Select>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <TextField
-                                                value={ing.quotes.find(q => q.brand === ing.selectedBrand)?.priceKG || ""}
-                                                type="number"
-                                                variant="standard"
-                                                InputProps={{ startAdornment: <span>R$</span> }}
-                                                onChange={e => {
-                                                    const idx = ing.quotes.findIndex(q => q.brand === ing.selectedBrand);
-                                                    handleQuoteChange(ing.id, idx, "priceKG", e.target.value);
-                                                }}
-                                                sx={{ width: 80 }}
-                                        />
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Box>
-                                                {ing.quotes.map((q, idx) => (
-                                                    <Box key={idx} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-                                                        <TextField
-                                                            value={q.brand}
-                                                            label={`Marca ${idx + 1}`}
-                                                            size="small"
-                                                            variant="standard"
-                                                            sx={{ width: 70, mr: 1 }}
-                                                            onChange={e => handleQuoteChange(ing.id, idx, "brand", e.target.value)}
-                                                        />
-                                                        <TextField
-                                                            value={q.priceKG}
-                                                            type="number"
-                                                            label="R$/kg"
-                                                            size="small"
-                                                            variant="standard"
-                                                            sx={{ width: 60 }}
-                                                            onChange={e => handleQuoteChange(ing.id, idx, "priceKG", e.target.value)}
-                                                        />
-                                                    </Box>
-                                                ))}
+                                    </Grid2>
+                                    <Divider sx={{ my: 1 }} />
+                                    {/* Marca selecionada em destaque, ocupa linha toda */}
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
+                                        <Typography variant="caption" sx={{ mb: 0.5 }}>
+                                            Marca Selecionada
+                                        </Typography>
+                                        <Select
+                                            value={ing.selectedBrand}
+                                            onChange={e => handleBrandSelect(ing.id, e.target.value)}
+                                            size="small"
+                                            sx={{
+                                                width: '100%',
+                                                bgcolor: 'primary.light',
+                                                fontWeight: 'bold',
+                                                border: '2px solid',
+                                                borderColor: 'primary.main',
+                                                color: 'white'
+                                            }}
+                                            displayEmpty
+                                        >
+                                            <MenuItem value=""><em>Selecione</em></MenuItem>
+                                            {ing.quotes.map((q, idx) =>
+                                                q.brand ? <MenuItem key={idx} value={q.brand}>{q.brand}</MenuItem> : null
+                                            )}
+                                        </Select>
+                                    </Box>
+                                    {/* Orçamentos ocupam linha toda, numerados */}
+                                    <Box sx={{ width: '100%' }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+                                            Orçamentos / Mercados
+                                        </Typography>
+                                        {ing.quotes.map((q, idx) => (
+                                            <Box key={idx} sx={{
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                gap: 1,
+                                                mb: 1,
+                                                p: 1,
+                                                borderRadius: 1,
+                                                bgcolor: q.brand === ing.selectedBrand ? 'primary.lighter' : 'transparent',
+                                                border: q.brand === ing.selectedBrand ? '1.5px solid' : '1px dashed #eee',
+                                                borderColor: q.brand === ing.selectedBrand ? 'primary.main' : '#eee'
+                                            }}>
+                                                <Typography variant="body2" sx={{ minWidth: 22, fontWeight: 600 }}>{idx + 1}.</Typography>
+                                                <TextField
+                                                    value={q.brand}
+                                                    label="Marca/Mercado"
+                                                    size="small"
+                                                    variant="standard"
+                                                    sx={{ flex: 1 }}
+                                                    fullWidth
+                                                    onChange={e => handleQuoteChange(ing.id, idx, "brand", e.target.value)}
+                                                />
+                                                <TextField
+                                                    value={q.priceKG}
+                                                    type="number"
+                                                    label="Valor (R$/kg)"
+                                                    size="small"
+                                                    variant="standard"
+                                                    sx={{ flex: 1, ml: 1 }}
+                                                    fullWidth
+                                                    onChange={e => handleQuoteChange(ing.id, idx, "priceKG", e.target.value)}
+                                                    InputProps={{ startAdornment: <span>R$</span> }}
+                                                />
                                             </Box>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <IconButton onClick={() => deleteIngredient(ing.id)} size="small" color="error">
-                                                <Delete />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {/* nova linha de inclusão pode ser adaptada conforme necessário */}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                        ))}
+                                    </Box>
+                                </Paper>
+                            </Grid2>
+                        ))}
+                        {/* Card para adicionar novo ingrediente */}
+                        <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                            <Paper elevation={1} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                <TextField
+                                    label="Ingrediente"
+                                    size="small"
+                                    variant="standard"
+                                    value={newIngredient.name}
+                                    onChange={e => setNewIngredient({ ...newIngredient, name: e.target.value })}
+                                    sx={{ mb: 1 }}
+                                />
+                                <TextField
+                                    label="Unidade"
+                                    size="small"
+                                    variant="standard"
+                                    value={newIngredient.unit}
+                                    onChange={e => setNewIngredient({ ...newIngredient, unit: e.target.value })}
+                                    sx={{ mb: 1 }}
+                                />
+                                <TextField
+                                    label="Qtd por pizza"
+                                    size="small"
+                                    variant="standard"
+                                    value={newIngredient.perPizza}
+                                    onChange={e => setNewIngredient({ ...newIngredient, perPizza: e.target.value })}
+                                    sx={{ mb: 1 }}
+                                />
+                                <TextField
+                                    label="Marca/Mercado"
+                                    size="small"
+                                    variant="standard"
+                                    value={newIngredient.brand}
+                                    onChange={e => setNewIngredient({ ...newIngredient, brand: e.target.value })}
+                                    sx={{ mb: 1 }}
+                                />
+                                <TextField
+                                    label="Valor/kg"
+                                    size="small"
+                                    variant="standard"
+                                    value={newIngredient.priceKG}
+                                    onChange={e => setNewIngredient({ ...newIngredient, priceKG: e.target.value })}
+                                    sx={{ mb: 1 }}
+                                />
+                                <IconButton onClick={addIngredient} size="small" color="primary"><Add /></IconButton>
+                            </Paper>
+                        </Grid2>
+                    </Grid2>
                 </Paper>
                 {/* Custos extras */}
                 <Paper sx={{ p: 3, mb: 4 }}>
                     <Typography variant="h5" color="secondary" gutterBottom>
-                        3. Custos Extras por Pizza
+                        4. Custos Extras por Pizza
                     </Typography>
                     <TableContainer>
                         <Table size="small">
@@ -419,7 +780,7 @@ const Index = () => {
                                 {extraCosts.map(e => (
                                     <TableRow key={e.id}>
                                         <TableCell>
-                                            <TextField value={e.name} variant="standard"
+                                            <TextField value={e.name} variant="standard" fullWidth
                                                 onChange={ev => handleExtraChange(e.id, "name", ev.target.value)} />
                                         </TableCell>
                                         <TableCell align="right">
@@ -437,11 +798,14 @@ const Index = () => {
                                 <TableRow>
                                     <TableCell>
                                         <TextField label="Nome" size="small" variant="standard"
+                                            fullWidth
                                             value={newExtra.name}
-                                            onChange={e => setNewExtra({ ...newExtra, name: e.target.value })} />
+                                            onChange={e => setNewExtra({ ...newExtra, name: e.target.value })}
+                                        />
                                     </TableCell>
                                     <TableCell>
                                         <TextField label="Valor" size="small" type="number" variant="standard"
+                                            fullWidth
                                             value={newExtra.value}
                                             onChange={e => setNewExtra({ ...newExtra, value: e.target.value })} />
                                     </TableCell>
@@ -456,65 +820,141 @@ const Index = () => {
                 {/* Equipamentos */}
                 <Paper sx={{ p: 3, mb: 4 }}>
                     <Typography variant="h5" color="secondary" gutterBottom>
-                        4. Máquinas e Investimento Inicial
+                        7. Máquinas e Investimento Inicial (até 3 orçamentos por item)
                     </Typography>
-                    <TableContainer>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Equipamento</TableCell>
-                                    <TableCell align="right">Valor total (R$)</TableCell>
-                                    <TableCell align="right">Parcelas</TableCell>
-                                    <TableCell align="right">Excluir</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {equipments.map(eq => (
-                                    <TableRow key={eq.id}>
-                                        <TableCell>
-                                            <TextField value={eq.name} variant="standard"
-                                                onChange={ev => handleEquipmentChange(eq.id, "name", ev.target.value)} />
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <TextField value={eq.price} type="number" variant="standard"
-                                                onChange={ev => handleEquipmentChange(eq.id, "price", Number(ev.target.value))}
-                                                sx={{ width: 100 }} />
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <TextField value={eq.installments} type="number" variant="standard"
-                                                onChange={ev => handleEquipmentChange(eq.id, "installments", Number(ev.target.value))}
-                                                sx={{ width: 60 }} />
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <IconButton onClick={() => deleteEquipment(eq.id)} size="small" color="error">
-                                                <Delete />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                <TableRow>
-                                    <TableCell>
-                                        <TextField label="Descrição" size="small" variant="standard"
-                                            value={newEquipment.name}
-                                            onChange={e => setNewEquipment({ ...newEquipment, name: e.target.value })} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <TextField label="Valor" size="small" type="number" variant="standard"
-                                            value={newEquipment.price}
-                                            onChange={e => setNewEquipment({ ...newEquipment, price: e.target.value })} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <TextField label="Parcelas" size="small" type="number" variant="standard"
-                                            value={newEquipment.installments}
-                                            onChange={e => setNewEquipment({ ...newEquipment, installments: e.target.value })} />
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <IconButton onClick={addEquipment} size="small" color="primary"><Add /></IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                    <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <TextField
+                            label="Parcelas do investimento"
+                            type="number"
+                            size="small"
+                            value={equipmentInstallments}
+                            onChange={e => setEquipmentInstallments(Math.max(1, Number(e.target.value)))}
+                            sx={{ width: 180 }}
+                            inputProps={{ min: 1 }}
+                        />
+                        <Typography>
+                            Valor da parcela: <b>R$ {equipmentInstallmentValue.toFixed(2)}</b>
+                        </Typography>
+                    </Box>
+                    <Grid2 container spacing={2}>
+                        {equipments.map((eq, i) => (
+                            <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={eq.id}>
+                                <Paper elevation={3} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    {/* Nome do equipamento */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                                        <TextField
+                                            value={eq.name}
+                                            variant="standard"
+                                            label="Equipamento"
+                                            onChange={e => setEquipments(equipments.map((x, idx) => idx === i ? { ...x, name: e.target.value } : x))}
+                                            sx={{ flex: 1, mb: 1 }}
+                                            fullWidth
+                                        />
+                                        <IconButton onClick={() => deleteEquipment(eq.id)} size="small" color="error">
+                                            <Delete />
+                                        </IconButton>
+                                    </Box>
+                                    {/* Marca selecionada em destaque */}
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
+                                        <Typography variant="caption" sx={{ mb: 0.5 }}>
+                                            Marca Selecionada
+                                        </Typography>
+                                        <Select
+                                            value={eq.selectedBrand}
+                                            onChange={e => handleEquipmentBrandSelect(eq.id, e.target.value)}
+                                            size="small"
+                                            sx={{
+                                                width: '100%',
+                                                bgcolor: 'primary.light',
+                                                fontWeight: 'bold',
+                                                border: '2px solid',
+                                                borderColor: 'primary.main',
+                                                color: 'white'
+                                            }}
+                                            displayEmpty
+                                        >
+                                            <MenuItem value=""><em>Selecione</em></MenuItem>
+                                            {eq.quotes.map((q, idx) =>
+                                                q.brand ? <MenuItem key={idx} value={q.brand}>{q.brand}</MenuItem> : null
+                                            )}
+                                        </Select>
+                                    </Box>
+                                    {/* Orçamentos ocupam linha toda, numerados */}
+                                    <Box sx={{ width: '100%' }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+                                            Orçamentos / Fornecedores
+                                        </Typography>
+                                        {eq.quotes.map((q, idx) => (
+                                            <Box key={idx} sx={{
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                gap: 1,
+                                                mb: 1,
+                                                p: 1,
+                                                borderRadius: 1,
+                                                bgcolor: q.brand === eq.selectedBrand ? 'primary.lighter' : 'transparent',
+                                                border: q.brand === eq.selectedBrand ? '1.5px solid' : '1px dashed #eee',
+                                                borderColor: q.brand === eq.selectedBrand ? 'primary.main' : '#eee'
+                                            }}>
+                                                <Typography variant="body2" sx={{ minWidth: 22, fontWeight: 600 }}>{idx + 1}.</Typography>
+                                                <TextField
+                                                    value={q.brand}
+                                                    label="Marca/Fornecedor"
+                                                    size="small"
+                                                    variant="standard"
+                                                    sx={{ flex: 1 }}
+                                                    fullWidth
+                                                    onChange={e => handleEquipmentQuoteChange(eq.id, idx, "brand", e.target.value)}
+                                                />
+                                                <TextField
+                                                    value={q.price}
+                                                    type="number"
+                                                    label="Valor (R$)"
+                                                    size="small"
+                                                    variant="standard"
+                                                    sx={{ flex: 1, ml: 1 }}
+                                                    fullWidth
+                                                    onChange={e => handleEquipmentQuoteChange(eq.id, idx, "price", e.target.value)}
+                                                    InputProps={{ startAdornment: <span>R$</span> }}
+                                                />
+                                            </Box>
+                                        ))}
+                                    </Box>
+                                </Paper>
+                            </Grid2>
+                        ))}
+                        {/* Card para adicionar novo equipamento */}
+                        <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                            <Paper elevation={1} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                <TextField
+                                    label="Equipamento"
+                                    size="small"
+                                    variant="standard"
+                                    value={newEquipment.name}
+                                    onChange={e => setNewEquipment({ ...newEquipment, name: e.target.value })}
+                                    sx={{ mb: 1 }}
+                                />
+                                <TextField
+                                    label="Marca/Fornecedor"
+                                    size="small"
+                                    variant="standard"
+                                    value={newEquipment.brand}
+                                    onChange={e => setNewEquipment({ ...newEquipment, brand: e.target.value })}
+                                    sx={{ mb: 1 }}
+                                />
+                                <TextField
+                                    label="Valor"
+                                    size="small"
+                                    variant="standard"
+                                    value={newEquipment.price}
+                                    onChange={e => setNewEquipment({ ...newEquipment, price: e.target.value })}
+                                    sx={{ mb: 1 }}
+                                />
+                                <IconButton onClick={addEquipment} size="small" color="primary"><Add /></IconButton>
+                            </Paper>
+                        </Grid2>
+                    </Grid2>
                     <Typography sx={{ mt: 2 }}><b>Investimento total estimado:</b> R$ {totalEquipment.toFixed(2)}</Typography>
                 </Paper>
                 {/* Custos Fixos */}
@@ -535,7 +975,7 @@ const Index = () => {
                                 {fixedCosts.map(fc => (
                                     <TableRow key={fc.id}>
                                         <TableCell>
-                                            <TextField value={fc.name} variant="standard"
+                                            <TextField value={fc.name} variant="standard" fullWidth
                                                 onChange={ev => handleFixedCostChange(fc.id, "name", ev.target.value)} />
                                         </TableCell>
                                         <TableCell align="right">
