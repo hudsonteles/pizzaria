@@ -83,11 +83,10 @@ const initialIngredients: Ingredient[] = [
     { id: 7, name: "Queijo Mussarela", unit: "g", perPizza: { marguerita: 120, calabresa: 120, toscana: 120, gorgonzola: 120 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
     { id: 8, name: "Queijo Gorgonzola", unit: "g", perPizza: { marguerita: 0, calabresa: 0, toscana: 0, gorgonzola: 60 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
     { id: 9, name: "Linguiça Toscana", unit: "g", perPizza: { marguerita: 0, calabresa: 0, toscana: 60, gorgonzola: 0 }, quotes: [{ brand: "", priceKG: 0 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "", },
-    { id: 10, name: "Tomate cereja", unit: "un", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "Cereja", priceKG: 15 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Cereja", },
-    { id: 11, name: "Manjericão", unit: "folha", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "Manjericão Fresco", priceKG: 4 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Manjericão Fresco", },
+    { id: 10, name: "Tomate cereja", unit: "un", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "Assaí", priceKG: 15 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Assaí", },
+    { id: 11, name: "Manjericão", unit: "folha", perPizza: { marguerita: 10, calabresa: 0, toscana: 0, gorgonzola: 0 }, quotes: [{ brand: "Adega", priceKG: 4 }, { brand: "", priceKG: 0 }, { brand: "", priceKG: 0 },], selectedBrand: "Adega", },
 ];
 
-// Adicione o tipo para EquipmentQuote e Equipment
 type EquipmentQuote = {
     brand: string;
     price: number;
@@ -135,54 +134,67 @@ const initialEquipments: Equipment[] = [
 
 const Index = () => {
 
-    const [ingredients, setIngredients] = useState<Ingredient[]>(initialIngredients);
-    const [equipments, setEquipments] = useState<Equipment[]>(initialEquipments);
+    // Funções utilitárias
+    function loadFromStorage<T>(key: string, fallback: T): T {
+        if (typeof window === "undefined") return fallback;
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : fallback;
+        } catch {
+            return fallback;
+        }
+    }
+    function saveToStorage<T>(key: string, value: T) {
+        if (typeof window === "undefined") return;
+        localStorage.setItem(key, JSON.stringify(value));
+    }
 
-    // Outros insumos
-    const [extraCosts, setExtraCosts] = useState<{
-        id: number;
-        name: string;
-        value: number;
-    }[]>([
-        { id: 1, name: "Embalagem a vácuo", value: 1.4 }
-    ]);
-    // Custos fixos operacionais
-    const [fixedCosts, setFixedCosts] = useState<{
-        id: number;
-        name: string;
-        value: number;
-    }[]>([
-        { id: 1, name: "Botijão de gás P13 (mensal)", value: 240 },
-        { id: 2, name: "Energia elétrica (mensal)", value: 90 }
-    ]);
-    // Parâmetros do negócio
-    const [pizzaParams, setPizzaParams] = useState({
-        marguerita: { price: 38, month: 50 },
-        calabresa: { price: 40, month: 60 },
-        toscana: { price: 42, month: 50 },
-        gorgonzola: { price: 45, month: 40 },
-    });
-    // Controle de edição/adição
-    const [newIngredient, setNewIngredient] = useState({
-        name: "",
-        unit: "g",
-        perPizza: "",
-        brand: "",
-        priceKG: ""
-    });
-    const [newExtra, setNewExtra] = useState({ name: "", value: "" });
-    const [newEquipment, setNewEquipment] = useState({ name: "", price: "", brand: "" });
-    const [newFixedCost, setNewFixedCost] = useState({ name: "", value: "" });
+    const [ingredients, setIngredients] = useState<Ingredient[]>(
+        () => loadFromStorage("ingredients", initialIngredients)
+    );
+    const [equipments, setEquipments] = useState<Equipment[]>(
+        () => loadFromStorage("equipments", initialEquipments)
+    );
+    const [extraCosts, setExtraCosts] = useState(
+        () => loadFromStorage("extraCosts", [
+            { id: 1, name: "Embalagem a vácuo", value: 1.4 }
+        ])
+    );
+    const [fixedCosts, setFixedCosts] = useState(
+        () => loadFromStorage("fixedCosts", [
+            { id: 1, name: "Botijão de gás P13 (mensal)", value: 240 },
+            { id: 2, name: "Energia elétrica (mensal)", value: 90 }
+        ])
+    );
+    const [pizzaParams, setPizzaParams] = useState(
+        () => loadFromStorage("pizzaParams", {
+            marguerita: { price: 38, month: 50 },
+            calabresa: { price: 40, month: 60 },
+            toscana: { price: 42, month: 50 },
+            gorgonzola: { price: 45, month: 40 },
+        })
+    );
+    const [doughComp, setDoughComp] = useState(
+        () => loadFromStorage("doughComp", {
+            farinha: 1000, fermento: 4, sal: 20, azeite: 30, agua: 600
+        })
+    );
+    const [doughYield, setDoughYield] = useState(
+        () => loadFromStorage("doughYield", 6)
+    );
+    const [equipmentInstallments, setEquipmentInstallments] = useState(
+        () => loadFromStorage("equipmentInstallments", 10)
+    );
 
-    // Novo estado para composição da massa
-    const [doughComp, setDoughComp] = useState({
-        farinha: 1000, // g
-        fermento: 4,   // g
-        sal: 20,       // g
-        azeite: 30,    // ml
-        agua: 600      // ml
-    });
-    const [doughYield, setDoughYield] = useState(6); // pizzas possíveis
+    // Salve no storage sempre que mudar
+    useEffect(() => { saveToStorage("ingredients", ingredients); }, [ingredients]);
+    useEffect(() => { saveToStorage("equipments", equipments); }, [equipments]);
+    useEffect(() => { saveToStorage("extraCosts", extraCosts); }, [extraCosts]);
+    useEffect(() => { saveToStorage("fixedCosts", fixedCosts); }, [fixedCosts]);
+    useEffect(() => { saveToStorage("pizzaParams", pizzaParams); }, [pizzaParams]);
+    useEffect(() => { saveToStorage("doughComp", doughComp); }, [doughComp]);
+    useEffect(() => { saveToStorage("doughYield", doughYield); }, [doughYield]);
+    useEffect(() => { saveToStorage("equipmentInstallments", equipmentInstallments); }, [equipmentInstallments]);
 
     // IDs fixos para ingredientes da massa
     const MASSA_IDS = {
@@ -293,12 +305,16 @@ const Index = () => {
 
     // --- Handlers CRUD ---
 
+    // Estado para novo ingrediente
+    const [newIngredient, setNewIngredient] = useState({
+        name: "",
+        unit: "g",
+        perPizza: "",
+        brand: "",
+        priceKG: ""
+    });
+
     // Ingredientes
-    const handleIngredientChange = (id, field, value) => {
-        setIngredients(ingredients.map(ing =>
-            ing.id === id ? { ...ing, [field]: value } : ing
-        ));
-    };
     const addIngredient = () => {
         if (!newIngredient.name || !newIngredient.perPizza || !newIngredient.priceKG || !newIngredient.brand) return;
         setIngredients([
@@ -319,6 +335,9 @@ const Index = () => {
         setNewIngredient({ name: "", unit: "g", perPizza: "", brand: "", priceKG: "" });
     };
     const deleteIngredient = (id) => setIngredients(ingredients.filter(x => x.id !== id));
+
+    // Estado para novo custo extra
+    const [newExtra, setNewExtra] = useState({ name: "", value: "" });
 
     // Extras
     const handleExtraChange = (id, field, value) =>
@@ -349,6 +368,9 @@ const Index = () => {
             eq.id === eqId ? { ...eq, selectedBrand: brand } : eq
         ));
     };
+    // Estado para novo equipamento
+    const [newEquipment, setNewEquipment] = useState({ name: "", price: "", brand: "" });
+
     const addEquipment = () => {
         if (!newEquipment.name || !newEquipment.price || !newEquipment.brand) return;
         setEquipments([
@@ -369,6 +391,7 @@ const Index = () => {
     const deleteEquipment = id => setEquipments(equipments.filter(x => x.id !== id));
 
     // Custos Fixos
+    const [newFixedCost, setNewFixedCost] = useState({ name: "", value: "" });
     const handleFixedCostChange = (id, field, value) =>
         setFixedCosts(fixedCosts.map(f => f.id === id ? { ...f, [field]: value } : f));
     const addFixedCost = () => {
@@ -377,9 +400,6 @@ const Index = () => {
         setNewFixedCost({ name: "", value: "" });
     };
     const deleteFixedCost = id => setFixedCosts(fixedCosts.filter(x => x.id !== id));
-
-    // Acrescente o estado para número de parcelas dos equipamentos
-    const [equipmentInstallments, setEquipmentInstallments] = useState(10);
 
     const equipmentInstallmentValue = equipmentInstallments > 0 ? totalEquipment / equipmentInstallments : totalEquipment;
 
@@ -547,19 +567,27 @@ const Index = () => {
                                                 size="small"
                                                 sx={{
                                                     width: '100%',
-                                                    bgcolor: 'primary.light',
+                                                    bgcolor: ing.selectedBrand ? 'primary.light' : '#fffbe6',
                                                     fontWeight: 'bold',
                                                     border: '2px solid',
-                                                    borderColor: 'primary.main',
-                                                    color: 'white'
+                                                    borderColor: ing.selectedBrand ? 'primary.main' : 'orange',
+                                                    color: ing.selectedBrand ? 'white' : 'orange'
                                                 }}
                                                 displayEmpty
+                                                error={!ing.selectedBrand}
                                             >
-                                                <MenuItem value=""><em>Selecione</em></MenuItem>
+                                                <MenuItem value="">
+                                                    <em style={{ color: 'orange' }}>Selecione uma marca</em>
+                                                </MenuItem>
                                                 {ing.quotes.map((q, idx) =>
                                                     q.brand ? <MenuItem key={idx} value={q.brand}>{q.brand}</MenuItem> : null
                                                 )}
                                             </Select>
+                                            {!ing.selectedBrand && (
+                                                <Typography variant="caption" color="orange" sx={{ mt: 0.5 }}>
+                                                    Selecione uma marca!
+                                                </Typography>
+                                            )}
                                         </Box>
                                         <Box sx={{ width: '100%' }}>
                                             <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
@@ -655,19 +683,27 @@ const Index = () => {
                                             size="small"
                                             sx={{
                                                 width: '100%',
-                                                bgcolor: 'primary.light',
+                                                bgcolor: ing.selectedBrand ? 'primary.light' : '#fffbe6',
                                                 fontWeight: 'bold',
                                                 border: '2px solid',
-                                                borderColor: 'primary.main',
-                                                color: 'white'
+                                                borderColor: ing.selectedBrand ? 'primary.main' : 'orange',
+                                                color: ing.selectedBrand ? 'white' : 'orange'
                                             }}
                                             displayEmpty
+                                            error={!ing.selectedBrand}
                                         >
-                                            <MenuItem value=""><em>Selecione</em></MenuItem>
+                                            <MenuItem value="">
+                                                <em style={{ color: 'orange' }}>Selecione uma marca</em>
+                                            </MenuItem>
                                             {ing.quotes.map((q, idx) =>
                                                 q.brand ? <MenuItem key={idx} value={q.brand}>{q.brand}</MenuItem> : null
                                             )}
                                         </Select>
+                                        {!ing.selectedBrand && (
+                                            <Typography variant="caption" color="orange" sx={{ mt: 0.5 }}>
+                                                Selecione uma marca!
+                                            </Typography>
+                                        )}
                                     </Box>
                                     {/* Orçamentos ocupam linha toda, numerados */}
                                     <Box sx={{ width: '100%' }}>
@@ -865,19 +901,27 @@ const Index = () => {
                                             size="small"
                                             sx={{
                                                 width: '100%',
-                                                bgcolor: 'primary.light',
+                                                bgcolor: eq.selectedBrand ? 'primary.light' : '#fffbe6',
                                                 fontWeight: 'bold',
                                                 border: '2px solid',
-                                                borderColor: 'primary.main',
-                                                color: 'white'
+                                                borderColor: eq.selectedBrand ? 'primary.main' : 'orange',
+                                                color: eq.selectedBrand ? 'white' : 'orange'
                                             }}
                                             displayEmpty
+                                            error={!eq.selectedBrand}
                                         >
-                                            <MenuItem value=""><em>Selecione</em></MenuItem>
+                                            <MenuItem value="">
+                                                <em style={{ color: 'orange' }}>Selecione uma marca</em>
+                                            </MenuItem>
                                             {eq.quotes.map((q, idx) =>
                                                 q.brand ? <MenuItem key={idx} value={q.brand}>{q.brand}</MenuItem> : null
                                             )}
                                         </Select>
+                                        {!eq.selectedBrand && (
+                                            <Typography variant="caption" color="orange" sx={{ mt: 0.5 }}>
+                                                Selecione uma marca!
+                                            </Typography>
+                                        )}
                                     </Box>
                                     {/* Orçamentos ocupam linha toda, numerados */}
                                     <Box sx={{ width: '100%' }}>
