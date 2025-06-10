@@ -2,7 +2,7 @@
 
 import MainContainer from "@/components/containers/main-container";
 import { Add, Delete } from "@mui/icons-material";
-import { Box, Container, Divider, Grid2, IconButton, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Container, Divider, Grid2, IconButton, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -133,6 +133,14 @@ const initialEquipments: Equipment[] = [
 ];
 
 const Index = () => {
+
+    // Sócios / Parceiros (exemplo inicial)
+    const [partners] = useState([
+        { id: 1, name: "André Mendonça", photo: "andre.jpg" },
+        { id: 2, name: "Fred Coelho", photo: "fred.jpg" },
+        { id: 2, name: "Hudson Teles", photo: "hudson.jpg" },
+        { id: 2, name: "Uyrah Ramos", photo: "uyrah.jpg" }
+    ]);
 
     // Funções utilitárias
     function loadFromStorage<T>(key: string, fallback: T): T {
@@ -429,13 +437,37 @@ const Index = () => {
         <MainContainer>
             <Container maxWidth="xl" sx={{ pb: 8 }}>
                 <Box sx={{ my: 4 }}>
-                    <Typography variant="h3" color="primary" align="center" gutterBottom>
-                        Planejamento Estratégico - Pizzaria Entre Amigos
+                    <Typography variant="h3" color="primary" align="center">
+                        Planejamento Estratégico
                     </Typography>
-                    <Typography align="center" color="text.secondary" gutterBottom>
+                    <Typography variant="h4" color="primary" align="center">
+                        Nostra Pizza
+                    </Typography>
+                    <Typography variant="h5" align="center" color="text.secondary" gutterBottom>
                         Simulador de Viabilidade
                     </Typography>
                 </Box>
+                {/* Sócios / Parceiros */}
+                <Paper sx={{ p: 3, mb: 4 }}>
+                    <Typography variant="h5" color="secondary" textAlign="center" mb={5}>
+                        🍕🍕🍕 Os Parceiros 🚀🚀🚀
+                    </Typography>
+                    <Grid2 container spacing={2} sx={{ mb: 2 }}>
+                        {partners.map((p) => (
+                            <Grid2 key={p.id} size={{ xs: 12, sm: 6, md: 3}}>
+                                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                    <Avatar
+                                        src={`partners/${p.photo}`}
+                                        sx={{ width: 80, height: 80, mb: 1, bgcolor: "#eee", fontSize: 32 }}
+                                    >
+                                        {!p.photo && p.name ? p.name[0].toUpperCase() : ""}
+                                    </Avatar>
+                                    <Typography variant="subtitle2" align="center">{p.name}</Typography>
+                                </Box>
+                            </Grid2>
+                        ))}
+                    </Grid2>
+                </Paper>
                 {/* 1. Parâmetros de Venda por Pizza */}
                 <Paper sx={{ p: 3, mb: 4 }}>
                     <Typography variant="h5" color="secondary" gutterBottom>1. Parâmetros de Venda por Pizza</Typography>
