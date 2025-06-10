@@ -454,7 +454,7 @@ const Index = () => {
                     </Typography>
                     <Grid2 container spacing={2} sx={{ mb: 2 }}>
                         {partners.map((p) => (
-                            <Grid2 key={p.id} size={{ xs: 12, sm: 6, md: 3}}>
+                            <Grid2 key={p.id} size={{ xs: 6, md: 3 }}>
                                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                                     <Avatar
                                         src={`partners/${p.photo}`}
